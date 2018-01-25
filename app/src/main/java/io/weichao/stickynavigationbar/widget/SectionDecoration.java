@@ -64,8 +64,6 @@ public class SectionDecoration extends RecyclerView.ItemDecoration {
         super.onDrawOver(c, parent, state);
 //        int itemCount = state.getItemCount();// 总共的 item 数量
         int childCount = parent.getChildCount();// 一屏显示的 item 数量
-        int left = parent.getPaddingLeft();// 悬浮栏左侧绘制的边界
-        int right = parent.getWidth() - parent.getPaddingRight();// 悬浮栏右侧绘制的边界
 
         for (int i = 0; i < childCount; i++) {
             View view = parent.getChildAt(i);
@@ -76,35 +74,30 @@ public class SectionDecoration extends RecyclerView.ItemDecoration {
                 continue;
             }
 
-            int viewTop = view.getTop();
-            int viewBottom = view.getBottom();
+            int left = parent.getPaddingLeft();// 悬浮栏左侧绘制的边界
+            int right = parent.getWidth() - parent.getPaddingRight();// 悬浮栏右侧绘制的边界
 
             // 第一个 item 特殊处理
             if (i == 0) {
                 // 组内最后一个 item
+                int viewBottom = view.getBottom();
                 if (isLastInGroup(position) && viewBottom < barTopGap) {
                     c.drawRect(left, viewBottom - barTopGap, right, viewBottom, barPaint);
                     c.drawText(title, left, viewBottom - alignBottom, textPaint);
                 } else
-                    // 组内第一个 item
-                    if (isFirstInGroup(position)) {
-                        float heightShown = Math.max(barTopGap, viewTop);
-                        c.drawRect(left, heightShown - barTopGap, right, heightShown, barPaint);
-                        c.drawText(title, left, heightShown - alignBottom, textPaint);
-                    } else
-                    // 既不是组内第一个也不是组内最后一个 item
-                    {
-                        c.drawRect(left, 0, right, barTopGap, barPaint);
-                        c.drawText(title, left, barTopGap - alignBottom, textPaint);
-                    }
+                // 非组内最后一个 item
+                {
+                    c.drawRect(left, 0, right, barTopGap, barPaint);
+                    c.drawText(title, left, barTopGap - alignBottom, textPaint);
+                }
             } else
             // 除了第一个 item
             {
                 // 组内第一个 item
                 if (isFirstInGroup(position)) {
-                    float heightShown = Math.max(barTopGap, viewTop);
-                    c.drawRect(left, heightShown - barTopGap, right, heightShown, barPaint);
-                    c.drawText(title, left, heightShown - alignBottom, textPaint);
+                    int viewTop = view.getTop();
+                    c.drawRect(left, viewTop - barTopGap, right, viewTop, barPaint);
+                    c.drawText(title, left, viewTop - alignBottom, textPaint);
                 }
             }
         }
