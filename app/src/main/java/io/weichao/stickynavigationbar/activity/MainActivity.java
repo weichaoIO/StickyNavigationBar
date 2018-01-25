@@ -20,7 +20,6 @@ import java.util.List;
 
 import io.weichao.stickynavigationbar.R;
 import io.weichao.stickynavigationbar.bean.DataResponseBean;
-import io.weichao.stickynavigationbar.bean.NameBean;
 import io.weichao.stickynavigationbar.model.MainModel;
 import io.weichao.stickynavigationbar.widget.SectionDecoration;
 
@@ -30,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private MainModel mModel;
 
     private RecyclerView mRecyclerView;
-    private ArrayList<NameBean> mNameBeanList;
+    private ArrayList<String> mTitleList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,24 +52,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void onSuccessGetData(DataResponseBean bean) {
         List<DataResponseBean.DataBean.ComingBean> comingBeanList = bean.getData().getComing();
+//        comingBeanList.addAll(bean.getData().getComing());
         setPullAction(comingBeanList);
-        mRecyclerView.addItemDecoration(new SectionDecoration(mNameBeanList, this, new SectionDecoration.DecorationCallback() {
-            //返回标记id (即每一项对应的标志性的字符串)
+        mRecyclerView.addItemDecoration(new SectionDecoration(this, new SectionDecoration.DecorationCallback() {
+            // 返回标记 id (即每一项对应的标志性的字符串)
             @Override
             public String getGroupId(int position) {
-                if (mNameBeanList.get(position).getName() != null) {
-                    return mNameBeanList.get(position).getName();
-                }
-                return "-1";
+                return mTitleList.get(position);
             }
 
-            //获取同组中的第一个内容
+            // 获取组的 title
             @Override
-            public String getGroupFirstLine(int position) {
-                if (mNameBeanList.get(position).getName() != null) {
-                    return mNameBeanList.get(position).getName();
-                }
-                return "";
+            public String getGroupTitle(int position) {
+                return mTitleList.get(position);
             }
         }));
         mRecyclerView.setAdapter(new MyRecyclerAdapter(this, comingBeanList));
@@ -81,12 +75,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setPullAction(List<DataResponseBean.DataBean.ComingBean> comingslist) {
-        mNameBeanList = new ArrayList<>();
+        mTitleList = new ArrayList<>();
         for (int i = 0; i < comingslist.size(); i++) {
-            NameBean nameBean = new NameBean();
-            String name = comingslist.get(i).getComingTitle();
-            nameBean.setName(name);
-            mNameBeanList.add(nameBean);
+            mTitleList.add(comingslist.get(i).getComingTitle());
         }
     }
 
@@ -136,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 mv_name.setText(coming.getNm());
                 mv_date.setText(coming.getShowInfo());
                 mv_dec.setText(coming.getScm());
-                //注：当你发下图片无法打开是，做个字符串替换即可
+                // 当图片无法打开时，替换字符串
                 String imagUrl = coming.getImg();
                 String newImagUrl = imagUrl.replaceAll("w.h", "50.80");
                 Glide.with(mContext)
